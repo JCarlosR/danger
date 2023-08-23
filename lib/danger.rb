@@ -18,7 +18,7 @@ Dir[File.expand_path("danger/*source/*.rb", File.dirname(__FILE__))].each do |fi
 end
 
 module Danger
-  GEM_NAME = "danger".freeze
+  GEM_NAME = "danger-additional-logging".freeze
 
   # @return [String] The path to the local gem directory
   def self.gem_path

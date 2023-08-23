@@ -10,6 +10,7 @@ module Danger
       self.folder = folder
       git_top_level = find_git_top_level_if_needed!(folder, lookup_top_level)
 
+      puts "diff_for_folder(folder=#{folder}, from=#{from}, to=#{to}, lookup=#{lookup_top_level})"
       repo = Git.open(git_top_level)
 
       ensure_commitish_exists!(from)
@@ -71,6 +72,7 @@ module Danger
     end
 
     def ensure_commitish_exists!(commitish)
+      puts "ensure_commitish_exists! #{commitish}"
       return ensure_commitish_exists_on_branch!(commitish, commitish) if commit_is_ref?(commitish)
       return if commit_exists?(commitish)
 
@@ -81,10 +83,13 @@ module Danger
     def ensure_commitish_exists_on_branch!(branch, commitish)
       return if commit_exists?(commitish)
 
+      puts "ensure_commitish_exists_on_branch!"
+
       depth = 0
       success =
         (3..6).any? do |factor|
           depth += Math.exp(factor).to_i
+          puts "git_fetch_branch_to_depth(#{branch}, depth=#{depth})"
 
           git_fetch_branch_to_depth(branch, depth)
           commit_exists?(commitish)
@@ -123,6 +128,8 @@ module Danger
     end
 
     def find_merge_base(repo, from, to)
+      puts "find_merge_base(repo=#{repo}, from=#{from}, to=#{to})"
+      
       possible_merge_base = possible_merge_base(repo, from, to)
       return possible_merge_base if possible_merge_base
 

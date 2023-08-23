@@ -2,14 +2,14 @@ lib = File.expand_path("lib", __dir__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require "danger/version"
 Gem::Specification.new do |spec|
-  spec.name          = "danger"
+  spec.name          = "danger-additional-logging"
   spec.version       = Danger::VERSION
   spec.authors       = ["Orta Therox", "Juanito Fatas"]
   spec.email         = ["orta.therox@gmail.com", "katehuang0320@gmail.com"]
   spec.license       = "MIT"
 
   spec.summary       = Danger::DESCRIPTION
-  spec.description   = "Stop Saying 'You Forgot To…' in Code Review"
+  spec.description   = "Just debugging for myself"
   spec.homepage      = "https://github.com/danger/danger"
 
   spec.files         = Dir["lib/**/*"] + %w(bin/danger README.md LICENSE)
