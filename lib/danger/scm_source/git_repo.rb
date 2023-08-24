@@ -49,13 +49,16 @@ module Danger
       end.compact
     end
 
-    def exec(string)
+    def exec(string, prints=false)
+      puts "exec: git #{string}, prints output #{prints}"
       require "open3"
       Dir.chdir(self.folder || ".") do
         git_command = string.split(" ").dup.unshift("git")
         Open3.popen2(default_env, *git_command) do |_stdin, stdout, _wait_thr|
           output = stdout.read.rstrip
-          puts output # Print the captured output
+          if (prints)
+            puts output # Print the captured output
+          end
           output # Return the captured output
         end
       end
@@ -98,7 +101,8 @@ module Danger
       puts "Is shallow repo:"
       exec("rev-parse --is-shallow-repository")
 
-      puts "Last 5 commits befor starting git_fetch_branch_to_depth:"
+      puts "Last 5 commits for #{branch}"
+      exec("branch -v")
       exec("--no-pager log -n 5")
 
       depth = 0
@@ -125,7 +129,6 @@ module Danger
     end
 
     def git_fetch_branch_to_depth(branch, depth)
-      puts "fetch --depth=#{depth} --prune origin +refs/heads/#{branch}:refs/remotes/origin/#{branch}"
       exec("fetch --depth=#{depth} --prune origin +refs/heads/#{branch}:refs/remotes/origin/#{branch}")
     end
 
