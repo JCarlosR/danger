@@ -54,7 +54,9 @@ module Danger
       Dir.chdir(self.folder || ".") do
         git_command = string.split(" ").dup.unshift("git")
         Open3.popen2(default_env, *git_command) do |_stdin, stdout, _wait_thr|
-          stdout.read.rstrip
+          output = stdout.read.rstrip
+          puts output # Print the captured output
+          output # Return the captured output
         end
       end
     end
@@ -81,14 +83,29 @@ module Danger
     end
 
     def ensure_commitish_exists_on_branch!(branch, commitish)
-      return if commit_exists?(commitish)
+      puts "ensure_commitish_exists_on_branch(#{branch}, commitish=#{commitish})!"
+      
+      exists = commit_exists?(commitish)
+      # return if commit_exists?(commitish)
 
-      puts "ensure_commitish_exists_on_branch!"
+      if (exists)
+        puts "The commit #{commitish} exists in #{branch}"
+        return
+      else
+        puts "The commit #{commitish} DOES NOT exist in #{branch}"
+      end
+
+      puts "Is shallow repo:"
+      exec("rev-parse --is-shallow-repository")
+
+      puts "Last 5 commits befor starting git_fetch_branch_to_depth:"
+      exec("--no-pager log -n 5")
 
       depth = 0
       success =
         (3..6).any? do |factor|
           depth += Math.exp(factor).to_i
+          
           puts "git_fetch_branch_to_depth(#{branch}, depth=#{depth})"
 
           git_fetch_branch_to_depth(branch, depth)
@@ -108,6 +125,7 @@ module Danger
     end
 
     def git_fetch_branch_to_depth(branch, depth)
+      puts "fetch --depth=#{depth} --prune origin +refs/heads/#{branch}:refs/remotes/origin/#{branch}"
       exec("fetch --depth=#{depth} --prune origin +refs/heads/#{branch}:refs/remotes/origin/#{branch}")
     end
 
@@ -145,6 +163,8 @@ module Danger
     end
 
     def find_merge_base_with_incremental_fetch(repo, from, to)
+      puts "find_merge_base_with_incremental_fetch"
+
       from_is_ref = commit_is_ref?(from)
       to_is_ref = commit_is_ref?(to)
 
